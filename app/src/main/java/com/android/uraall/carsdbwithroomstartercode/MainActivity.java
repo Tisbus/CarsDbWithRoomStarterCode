@@ -2,6 +2,7 @@ package com.android.uraall.carsdbwithroomstartercode;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -9,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -21,15 +21,15 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
 
-import Data.DatabaseHandler;
 import Model.Car;
+import Model.CarViewModel;
 
 public class MainActivity extends AppCompatActivity {
 
     private CarsAdapter carsAdapter;
-    private ArrayList<Car> cars = new ArrayList<>();
+    private List<Car> cars = new ArrayList<>();
     private RecyclerView recyclerView;
-    private DatabaseHandler dbHandler;
+    private CarViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,9 +37,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         recyclerView = findViewById(R.id.recyclerView);
-        dbHandler = new DatabaseHandler(this);
+        viewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication()).create(CarViewModel.class);
 
-        cars.addAll(dbHandler.getAllCars());
+        cars = viewModel.getCars();
 
         carsAdapter = new CarsAdapter(this, cars, MainActivity.this);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -92,8 +92,9 @@ public class MainActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialogBox, int id) {
 
                                 if (isUpdate) {
-
-                                    deleteCar(car, position);
+                                    viewModel.delete(car);
+                                    cars.remove(position);
+                                    carsAdapter.notifyDataSetChanged();
                                 } else {
 
                                     dialogBox.cancel();
@@ -123,52 +124,18 @@ public class MainActivity extends AppCompatActivity {
 
 
                 if (isUpdate && car != null) {
-
-                    updateCar(nameEditText.getText().toString(), priceEditText.getText().toString(), position);
+                    car.setName(nameEditText.getText().toString());
+                    car.setPrice(priceEditText.getText().toString());
+                    viewModel.update(car);
+                    carsAdapter.notifyDataSetChanged();
                 } else {
-
-                    createCar(nameEditText.getText().toString(), priceEditText.getText().toString());
+                    Car car = new Car(0, nameEditText.getText().toString(), priceEditText.getText().toString());
+                    viewModel.insert(car);
+                    cars.add(car);
+                    carsAdapter.notifyDataSetChanged();
                 }
             }
         });
-    }
-
-    private void deleteCar(Car car, int position) {
-
-        cars.remove(position);
-        dbHandler.deleteCar(car);
         carsAdapter.notifyDataSetChanged();
-    }
-
-    private void updateCar(String name, String price, int position) {
-
-        Car car = cars.get(position);
-
-        car.setName(name);
-        car.setPrice(price);
-
-        dbHandler.updateCar(car);
-
-        cars.set(position, car);
-
-        carsAdapter.notifyDataSetChanged();
-
-
-    }
-
-    private void createCar(String name, String price) {
-
-        long id = dbHandler.insertCar(name, price);
-
-
-        Car car = dbHandler.getCar(id);
-
-        if (car != null) {
-
-            cars.add(0, car);
-            carsAdapter.notifyDataSetChanged();
-
-        }
-
     }
 }

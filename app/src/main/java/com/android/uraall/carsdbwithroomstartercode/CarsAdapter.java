@@ -1,5 +1,6 @@
 package com.android.uraall.carsdbwithroomstartercode;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,13 +10,14 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import Model.Car;
 
 public class CarsAdapter extends RecyclerView.Adapter<CarsAdapter.MyViewHolder> {
 
     private Context context;
-    private ArrayList<Car> cars;
+    private List<Car> cars;
     private MainActivity mainActivity;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -33,7 +35,7 @@ public class CarsAdapter extends RecyclerView.Adapter<CarsAdapter.MyViewHolder> 
     }
 
 
-    public CarsAdapter(Context context, ArrayList<Car> cars, MainActivity mainActivity) {
+    public CarsAdapter(Context context, List<Car> cars, MainActivity mainActivity) {
         this.context = context;
         this.cars = cars;
         this.mainActivity = mainActivity;
@@ -48,7 +50,7 @@ public class CarsAdapter extends RecyclerView.Adapter<CarsAdapter.MyViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, final int position) {
+    public void onBindViewHolder(MyViewHolder holder, @SuppressLint("RecyclerView") final int position) {
 
 
         final Car car = cars.get(position);
@@ -61,8 +63,8 @@ public class CarsAdapter extends RecyclerView.Adapter<CarsAdapter.MyViewHolder> 
 
             @Override
             public void onClick(View v) {
-
                 mainActivity.addAndEditCars(true, car, position);
+                notifyDataSetChanged();
             }
         });
 
