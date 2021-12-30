@@ -17,6 +17,12 @@ import Model.Car;
 public class CarsAdapter extends RecyclerView.Adapter<CarsAdapter.MyViewHolder> {
 
     private Context context;
+
+    public void setCars(List<Car> cars) {
+        this.cars = cars;
+        notifyDataSetChanged();
+    }
+
     private List<Car> cars;
     private MainActivity mainActivity;
 

@@ -2,6 +2,8 @@ package com.android.uraall.carsdbwithroomstartercode;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -39,9 +41,10 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         viewModel = ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication()).create(CarViewModel.class);
 
-        cars = viewModel.getCars();
+//        cars = viewModel.getCars();
 
         carsAdapter = new CarsAdapter(this, cars, MainActivity.this);
+        getData();
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -60,6 +63,16 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+
+    }
+    public void getData(){
+        LiveData<List<Car>> carsLiveData = viewModel.getCarsLiveData();
+        carsLiveData.observe(this, new Observer<List<Car>>() {
+            @Override
+            public void onChanged(List<Car> cars) {
+                carsAdapter.setCars(cars);
+            }
+        });
     }
 
     public void addAndEditCars(final boolean isUpdate, final Car car, final int position) {
@@ -93,8 +106,8 @@ public class MainActivity extends AppCompatActivity {
 
                                 if (isUpdate) {
                                     viewModel.delete(car);
-                                    cars.remove(position);
-                                    carsAdapter.notifyDataSetChanged();
+/*                                    cars.remove(position);
+                                    carsAdapter.notifyDataSetChanged();*/
                                 } else {
 
                                     dialogBox.cancel();
@@ -127,15 +140,15 @@ public class MainActivity extends AppCompatActivity {
                     car.setName(nameEditText.getText().toString());
                     car.setPrice(priceEditText.getText().toString());
                     viewModel.update(car);
-                    carsAdapter.notifyDataSetChanged();
+/*                    carsAdapter.notifyDataSetChanged();*/
                 } else {
                     Car car = new Car(0, nameEditText.getText().toString(), priceEditText.getText().toString());
                     viewModel.insert(car);
-                    cars.add(car);
-                    carsAdapter.notifyDataSetChanged();
+/*                    cars.add(car);
+                    carsAdapter.notifyDataSetChanged();*/
                 }
             }
         });
-        carsAdapter.notifyDataSetChanged();
+/*        carsAdapter.notifyDataSetChanged();*/
     }
 }

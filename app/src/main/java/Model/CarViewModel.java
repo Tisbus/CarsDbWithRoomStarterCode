@@ -5,23 +5,31 @@ import android.os.AsyncTask;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+
 import java.util.List;
 
 import Data.CarDataBase;
 
 public class CarViewModel extends AndroidViewModel {
 
-    private List<Car> cars;
+/*    private List<Car> cars;*/
+
+    private LiveData<List<Car>> carsLiveData;
     private static CarDataBase dataBase;
 
-    public List<Car> getCars() {
+/*    public List<Car> getCars() {
         return cars;
-    }
+    }*/
 
+    public LiveData<List<Car>> getCarsLiveData() {
+        return carsLiveData;
+    }
     public CarViewModel(@NonNull Application application) {
         super(application);
         dataBase = CarDataBase.getInstance(getApplication());
-        cars = dataBase.carDao().getAllCars();
+/*        cars = dataBase.carDao().getAllCars();*/
+        carsLiveData = dataBase.carDao().getAllCarsLive();
     }
 
     public void insert(Car car){new InsertTask().execute(car);}
